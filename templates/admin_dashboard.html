@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<main class="admin-wrap">
+  <header class="admin-header">
+    <div>
+      <span class="stub-eyebrow">Admin <span class="cjk">管理员 / 管理員</span></span>
+      <h1 class="panel-title">Locations <span class="cjk">地点 / 地點</span></h1>
+      {% if session.get('admin_email') %}
+        <p class="signed-in-as">Signed in as {{ session['admin_email'] }}</p>
+      {% endif %}
+    </div>
+    <a class="ghost-btn" href="{{ url_for('admin_logout') }}">Log out <span class="cjk">登出</span></a>
+  </header>
+
+  <section class="panel add-panel">
+    <h2 class="panel-subtitle">Add a location <span class="cjk">添加地点 / 添加地點</span></h2>
+    <form method="POST" class="add-form">
+      <input
+        type="text"
+        name="name"
+        placeholder="e.g. Warehouse 3, Front Desk, Loading Dock"
+        required
+      >
+      <button type="submit" class="punch-btn">Add Location <span class="cjk">添加</span></button>
+    </form>
+  </section>
+
+  <section class="locations-list">
+    {% if locations|length == 0 %}
+      <div class="empty-state">
+        <p>No locations yet. Add one above to generate its check-in page.</p>
+        <p class="cjk">暂无地点，请在上方添加以生成签到页面。 / 暫無地點，請在上方添加以生成簽到頁面。</p>
+      </div>
+    {% endif %}
+
+    {% for loc in locations %}
+      <div class="location-card">
+        <div class="location-info">
+          <h3>{{ loc["name"] }}</h3>
+          <a class="location-link" href="{{ url_for('log_page', slug=loc['slug']) }}" target="_blank">
+            {{ request.host_url }}log/{{ loc["slug"] }}
+          </a>
+        </div>
+        <div class="location-meta">
+          <span class="log-count">{{ loc["log_count"] }} log{{ '' if loc["log_count"] == 1 else 's' }}</span>
+        </div>
+        <div class="location-actions">
+          <a class="ghost-btn" href="{{ url_for('admin_location_log', location_id=loc['id']) }}">
+            View Log <span class="cjk">查看记录 / 查看記錄</span>
+          </a>
+          <form method="POST" action="{{ url_for('admin_delete_location', location_id=loc['id']) }}"
+                onsubmit="return confirm('Delete this location and all of its logs? This cannot be undone.');">
+            <button type="submit" class="danger-btn">Delete <span class="cjk">删除 / 刪除</span></button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}

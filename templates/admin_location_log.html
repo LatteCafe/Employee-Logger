@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ location["name"] }} · Log{% endblock %}
+{% block content %}
+<main class="admin-wrap">
+  <header class="admin-header">
+    <div>
+      <span class="stub-eyebrow">Log for <span class="cjk">记录 / 記錄</span></span>
+      <h1 class="panel-title">{{ location["name"] }}</h1>
+      <a class="location-link" href="{{ url_for('log_page', slug=location['slug']) }}" target="_blank">
+        {{ request.host_url }}log/{{ location["slug"] }}
+      </a>
+    </div>
+    <a class="ghost-btn" href="{{ url_for('admin_dashboard') }}">← Back to Locations <span class="cjk">返回</span></a>
+  </header>
+
+  <section class="panel">
+    {% if logs|length == 0 %}
+      <div class="empty-state">
+        <p>No check-ins recorded for this location yet.</p>
+        <p class="cjk">此地点暂无签到记录。 / 此地點暫無簽到記錄。</p>
+      </div>
+    {% else %}
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Employee <span class="cjk">员工 / 員工</span></th>
+            <th>Type <span class="cjk">类型 / 類型</span></th>
+            <th>Time <span class="cjk">时间 / 時間</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in logs %}
+            <tr>
+              <td>{{ entry["employee_name"] }}</td>
+              <td>
+                {% if entry["entry_type"] == "OUT" %}
+                  <span class="badge badge-out">Check-Out <span class="cjk">签退/簽退</span></span>
+                {% else %}
+                  <span class="badge badge-in">Check-In <span class="cjk">签到/簽到</span></span>
+                {% endif %}
+              </td>
+              <td class="mono">{{ entry["logged_at"] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

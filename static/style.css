@@ -1,0 +1,467 @@
+:root {
+  --ink: #2e1a47;
+  --ink-soft: #6b5b80;
+  --paper: #f6f3ec;
+  --paper-raised: #ffffff;
+  --amber: #1fae9a;
+  --amber-deep: #16826f;
+  --line: #d8d2c4;
+  --danger: #b3492f;
+  --success: #4c7a52;
+  --radius: 4px;
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-cjk: "Noto Sans SC", "Noto Sans TC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.cjk {
+  font-family: var(--font-cjk);
+  font-weight: 400;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(22,32,43,0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+/* ---------------- Flash messages ---------------- */
+
+.flash-stack {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(420px, 90vw);
+}
+
+.flash {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgba(22,32,43,0.15);
+}
+
+.flash-error { background: var(--danger); color: #fff; }
+.flash-success { background: var(--success); color: #fff; }
+
+/* ---------------- Shared type ---------------- */
+
+.stub-eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+  margin-bottom: 6px;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.9rem;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.01em;
+}
+
+.panel-subtitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.1rem;
+  margin: 0 0 14px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+.stub-note {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  margin-top: 16px;
+}
+
+/* ---------------- Buttons & inputs ---------------- */
+
+.punch-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.92rem;
+  background: var(--ink);
+  color: var(--amber);
+  border: none;
+  border-radius: var(--radius);
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+
+.punch-btn:hover { background: #223042; }
+.punch-btn:active { transform: scale(0.97); }
+
+.ghost-btn {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ghost-btn:hover { background: var(--ink); color: var(--paper); }
+
+.danger-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--danger);
+  background: transparent;
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.danger-btn:hover { background: var(--danger); color: #fff; }
+
+input[type="text"], input[type="password"] {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 13px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
+  width: 100%;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+  border-color: var(--amber-deep);
+}
+
+label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+/* ---------------- Employee check-in "stub" ---------------- */
+
+.stub-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.stub {
+  position: relative;
+  background: var(--paper-raised);
+  width: min(420px, 100%);
+  padding: 40px 32px 32px;
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(22,32,43,0.14);
+  border: 1px solid var(--line);
+}
+
+.stub-perf {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background:
+    radial-gradient(circle 7px at 20px 0, transparent 6px, var(--paper) 7px) top left / 40px 20px repeat-x,
+    var(--ink);
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
+.stub-head {
+  margin-top: 14px;
+  margin-bottom: 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.stub-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.stub-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Stamp confirmation */
+
+.stamp {
+  text-align: center;
+  padding: 18px 0 4px;
+}
+
+.stamp-mark {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--success);
+  border: 3px solid var(--success);
+  border-radius: 999px;
+  padding: 10px 22px;
+  transform: rotate(-4deg);
+  margin-bottom: 18px;
+}
+
+.stamp-out .stamp-mark {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Check-in / check-out badges in the admin log table */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.badge .cjk {
+  color: inherit;
+  font-size: 0.85em;
+  margin-left: 2px;
+}
+
+.badge-in {
+  background: rgba(76, 122, 82, 0.14);
+  color: var(--success);
+}
+
+.badge-out {
+  background: rgba(179, 73, 47, 0.12);
+  color: var(--danger);
+}
+
+.stamp-line {
+  font-size: 1.15rem;
+  margin: 4px 0;
+}
+
+.stamp-time {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+/* ---------------- Admin: centered login ---------------- */
+
+.center-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.panel-narrow {
+  width: min(360px, 100%);
+}
+
+.pin-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.pin-input {
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.signed-in-as {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin: 2px 0 0 0;
+}
+
+/* ---------------- Admin dashboard ---------------- */
+
+.admin-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.add-panel { margin-bottom: 24px; }
+
+.add-form {
+  display: flex;
+  gap: 10px;
+}
+
+.add-form input { flex: 1; }
+
+.locations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.location-card {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.location-info { flex: 1; min-width: 200px; }
+
+.location-info h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0 0 4px 0;
+}
+
+.location-link {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--amber-deep);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.location-link:hover { text-decoration: underline; }
+
+.location-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.location-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  color: var(--ink-soft);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+}
+
+/* ---------------- Log table ---------------- */
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.log-table th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 0 12px 10px;
+  border-bottom: 1.5px solid var(--ink);
+}
+
+.log-table td {
+  padding: 12px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.log-table tr:last-child td { border-bottom: none; }
+
+.mono { font-family: var(--font-mono); }
+
+/* ---------------- Responsive ---------------- */
+
+@media (max-width: 520px) {
+  .admin-header { flex-direction: column; }
+  .add-form { flex-direction: column; }
+  .pin-form { flex-direction: column; }
+  .location-actions { width: 100%; justify-content: flex-end; }
+}

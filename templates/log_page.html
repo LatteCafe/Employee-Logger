@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ location["name"] }} · Check-In{% endblock %}
+{% block content %}
+<main class="stub-wrap">
+  <div class="stub">
+    <div class="stub-perf" aria-hidden="true"></div>
+
+    <div class="stub-head">
+      <span class="stub-eyebrow">Location <span class="cjk">地点 / 地點</span></span>
+      <h1 class="stub-title">{{ location["name"] }}</h1>
+    </div>
+
+    {% if submitted_name %}
+      <div class="stamp {{ 'stamp-out' if submitted_type == 'OUT' else 'stamp-in' }}">
+        {% if submitted_type == 'OUT' %}
+          <div class="stamp-mark">✓ Checked Out <span class="cjk">已签退 / 已簽退</span></div>
+        {% else %}
+          <div class="stamp-mark">✓ Checked In <span class="cjk">已签到 / 已簽到</span></div>
+        {% endif %}
+        <p class="stamp-line"><strong>{{ submitted_name }}</strong></p>
+        <p class="stamp-time"><span id="clock-text"></span></p>
+        <a class="ghost-btn" href="{{ url_for('log_page', slug=location['slug']) }}">
+          Log another employee <span class="cjk">记录下一位员工 / 記錄下一位員工</span>
+        </a>
+      </div>
+      <script>
+        document.getElementById('clock-text').textContent = new Date().toLocaleString();
+      </script>
+    {% else %}
+      <form method="POST" class="stub-form" autocomplete="off">
+        <label for="employee_name">Employee name <span class="cjk">员工姓名 / 員工姓名</span></label>
+        <input
+          type="text"
+          id="employee_name"
+          name="employee_name"
+          placeholder="Type your name / 请输入姓名 / 請輸入姓名"
+          autofocus
+          required
+        >
+        <button type="submit" class="punch-btn">Punch In / Out <span class="cjk">签到 / 签退 · 簽到 / 簽退</span></button>
+      </form>
+      <p class="stub-note">
+        Your name and the current time will be recorded for this location. Your first entry each round is a check-in, the next is a check-out.
+        <br>
+        <span class="cjk">系统会记录您的姓名和当前时间。首次记录为签到，下一次为签退。</span>
+        <br>
+        <span class="cjk">系統會記錄您的姓名和當前時間。首次記錄為簽到，下一次為簽退。</span>
+      </p>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

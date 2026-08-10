@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Admin Login · 管理员登录 · 管理員登入{% endblock %}
+{% block content %}
+<main class="center-wrap">
+  <div class="panel panel-narrow">
+    <span class="stub-eyebrow">Admin · 管理员 · 管理員</span>
+    <h1 class="panel-title">Log In <span class="cjk">登录 / 登入</span></h1>
+    <form method="POST" class="login-form">
+      <div>
+        <label for="email">Email <span class="cjk">电子邮箱 / 電子郵箱</span></label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          autofocus
+          required
+        >
+      </div>
+      <div>
+        <label for="password">Password <span class="cjk">密码 / 密碼</span></label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="••••••••"
+          required
+        >
+      </div>
+      <button type="submit" class="punch-btn">Log In <span class="cjk">登录 / 登入</span></button>
+    </form>
+  </div>
+</main>
+{% endblock %}
