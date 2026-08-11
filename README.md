@@ -45,15 +45,20 @@ Chinese.
 Credentials are stored in `admin_credentials.json`, separate from
 `database.db`, with the password hashed (never stored in plain text).
 
-**To set your own admin email/password**, run:
+You can have **multiple admin accounts**. Manage them two ways:
 
-```
-python3 set_admin_credentials.py
-```
+- **From the web UI:** log in, then click "Manage Admins" on the
+  dashboard to add or remove admin accounts (typed there, no shell
+  access needed — this is the easiest option on a host like Render).
+- **From the command line:**
+  ```
+  python3 manage_admins.py list      # see all admin accounts
+  python3 manage_admins.py add       # add a new admin, or reset an existing one's password
+  python3 manage_admins.py remove    # remove an admin
+  ```
 
-It will prompt you for an email and password (typed input is hidden) and
-overwrite whatever was there before. Run this any time to change the
-login.
+There's always a safeguard: the app refuses to remove the last remaining
+admin account, so you can never lock yourself out entirely.
 
 `admin_credentials.json` and `database.db` are listed in `.gitignore` so
 they won't accidentally get committed if you put this project in git.
@@ -93,8 +98,12 @@ they won't accidentally get committed if you put this project in git.
   - Name matching for this purpose is case-insensitive ("Alice" and
     "alice" are treated as the same person), so make sure employees enter
     their name consistently.
-- After submitting, they see a confirmation of which one it was, and can
-  log another employee from the same device.
+- After submitting, they see a confirmation of which one it was. On a
+  check-out, they're also shown an optional text box to describe what
+  services were done during that visit — this gets saved onto that same
+  log entry. They can leave it blank to skip.
+- After that (or right away for a check-in), they see the final
+  confirmation and can log another employee from the same device.
 
 ## Notes on the database
 
@@ -102,7 +111,8 @@ Two tables are created automatically:
 
 - `locations` — id, name, slug (used in the URL), created_at
 - `logs` — id, location_id (foreign key), employee_name, entry_type
-  (`IN` or `OUT`), logged_at
+  (`IN` or `OUT`), services (free text, only set on some check-outs),
+  logged_at
 
 You can inspect the database directly with any SQLite browser, or via the
 command line:
@@ -121,8 +131,8 @@ real/ongoing use:
   reverse proxy (e.g. nginx), ideally over HTTPS.
 - Set a fixed `SECRET_KEY` environment variable (otherwise a new random key
   is generated each restart, which will log out all active admin sessions).
-- Set your own admin credentials with `set_admin_credentials.py` instead of
-  using the auto-generated default.
+- Set your own admin credentials with `manage_admins.py`, or the "Manage
+  Admins" page in the app, instead of using the auto-generated default.
 - Back up `database.db` periodically. Keep `admin_credentials.json` private
   — treat it like any other password file.
 
@@ -182,6 +192,5 @@ A couple of things worth knowing about Render specifically:
 - If you ever change `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars after the
   first deploy, they won't do anything on their own — those are only read
   once, when no credentials file exists yet. To change the login later,
-  either delete `admin_credentials.json` from the persistent disk (via a
-  Render shell session) and redeploy, or add a one-off job/shell command
-  that runs `python3 set_admin_credentials.py`.
+  just log in with the existing account and use the "Manage Admins" page
+  to add a new admin or reset a password — no shell access needed.

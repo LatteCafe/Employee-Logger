@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Manage Admins{% endblock %}
+{% block content %}
+<main class="admin-wrap">
+  <header class="admin-header">
+    <div>
+      <span class="stub-eyebrow">Admin <span class="cjk">管理员 / 管理員</span></span>
+      <h1 class="panel-title">Manage Admins <span class="cjk">管理员账号 / 管理員帳號</span></h1>
+    </div>
+    <a class="ghost-btn" href="{{ url_for('admin_dashboard') }}">← Back to Locations <span class="cjk">返回</span></a>
+  </header>
+
+  <section class="panel add-panel">
+    <h2 class="panel-subtitle">Add an admin <span class="cjk">添加管理员 / 添加管理員</span></h2>
+    <form method="POST" class="login-form">
+      <input type="hidden" name="action" value="add">
+      <div>
+        <label for="new_email">Email <span class="cjk">电子邮箱 / 電子郵箱</span></label>
+        <input type="email" id="new_email" name="email" placeholder="colleague@example.com" required>
+      </div>
+      <div>
+        <label for="new_password">Password <span class="cjk">密码 / 密碼</span></label>
+        <input type="password" id="new_password" name="password" placeholder="At least 8 characters" required>
+      </div>
+      <div>
+        <label for="new_password_confirm">Confirm password <span class="cjk">确认密码 / 確認密碼</span></label>
+        <input type="password" id="new_password_confirm" name="confirm_password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="punch-btn">Add Admin <span class="cjk">添加</span></button>
+    </form>
+    <p class="stub-note">
+      Adding an email that already exists will reset that admin's password instead of creating a duplicate.
+      <br><span class="cjk">若邮箱已存在，将重置该管理员的密码，而不会创建重复账号。</span>
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-subtitle">Current admins <span class="cjk">当前管理员 / 目前管理員</span></h2>
+    {% if admins|length == 0 %}
+      <div class="empty-state">
+        <p>No admin accounts exist. This shouldn't happen — please check the server logs.</p>
+      </div>
+    {% else %}
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Email <span class="cjk">电子邮箱 / 電子郵箱</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for admin in admins %}
+            <tr>
+              <td>
+                {{ admin["email"] }}
+                {% if admin["email"] == session.get("admin_email") %}
+                  <span class="badge badge-in">You <span class="cjk">你</span></span>
+                {% endif %}
+              </td>
+              <td style="text-align:right;">
+                {% if admin["email"] != session.get("admin_email") and admins|length > 1 %}
+                  <form method="POST"
+                        onsubmit="return confirm('Remove admin {{ admin["email"] }}? This cannot be undone.');">
+                    <input type="hidden" name="action" value="remove">
+                    <input type="hidden" name="email" value="{{ admin['email'] }}">
+                    <button type="submit" class="danger-btn">Remove <span class="cjk">移除</span></button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if admins|length == 1 %}
+        <p class="stub-note">
+          At least one admin must always remain, so the only account can't be removed.
+          <br><span class="cjk">系统必须始终保留至少一位管理员，因此无法移除唯一的账号。</span>
+        </p>
+      {% endif %}
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

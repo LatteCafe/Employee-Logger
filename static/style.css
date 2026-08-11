@@ -151,7 +151,7 @@ a { color: inherit; }
 
 .danger-btn:hover { background: var(--danger); color: #fff; }
 
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], input[type="email"], textarea {
   font-family: var(--font-body);
   font-size: 1rem;
   padding: 13px 14px;
@@ -162,10 +162,30 @@ input[type="text"], input[type="password"] {
   width: 100%;
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
+textarea {
+  resize: vertical;
+  min-height: 90px;
+  font-family: var(--font-body);
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, textarea:focus {
   outline: 2px solid var(--amber);
   outline-offset: 1px;
   border-color: var(--amber-deep);
+}
+
+.optional-tag {
+  font-weight: 400;
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.services-cell {
+  max-width: 320px;
+  white-space: pre-wrap;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
 }
 
 label {
@@ -418,6 +438,13 @@ label {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .empty-state {

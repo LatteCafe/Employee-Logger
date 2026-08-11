@@ -26,6 +26,7 @@
             <th>Employee <span class="cjk">员工 / 員工</span></th>
             <th>Type <span class="cjk">类型 / 類型</span></th>
             <th>Time <span class="cjk">时间 / 時間</span></th>
+            <th>Services <span class="cjk">服务内容 / 服務內容</span></th>
           </tr>
         </thead>
         <tbody>
@@ -40,6 +41,7 @@
                 {% endif %}
               </td>
               <td class="mono">{{ entry["logged_at"] }}</td>
+              <td class="services-cell">{{ entry["services"] or "—" }}</td>
             </tr>
           {% endfor %}
         </tbody>

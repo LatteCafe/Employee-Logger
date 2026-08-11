@@ -10,7 +10,10 @@
         <p class="signed-in-as">Signed in as {{ session['admin_email'] }}</p>
       {% endif %}
     </div>
-    <a class="ghost-btn" href="{{ url_for('admin_logout') }}">Log out <span class="cjk">登出</span></a>
+    <div class="header-actions">
+      <a class="ghost-btn" href="{{ url_for('admin_manage_admins') }}">Manage Admins <span class="cjk">管理员账号</span></a>
+      <a class="ghost-btn" href="{{ url_for('admin_logout') }}">Log out <span class="cjk">登出</span></a>
+    </div>
   </header>
 
   <section class="panel add-panel">

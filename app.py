@@ -67,14 +67,15 @@ def init_db():
                 location_id INTEGER NOT NULL,
                 employee_name TEXT NOT NULL,
                 entry_type TEXT NOT NULL DEFAULT 'IN',
+                services TEXT,
                 logged_at TEXT NOT NULL,
                 FOREIGN KEY (location_id) REFERENCES locations (id)
                     ON DELETE CASCADE
             );
             """
         )
-        # Backfill entry_type column for databases created before this
-        # feature existed.
+        # Backfill columns for databases created before these features
+        # existed.
         existing_columns = [
             row["name"] for row in db.execute("PRAGMA table_info(logs)")
         ]
@@ -82,6 +83,8 @@ def init_db():
             db.execute(
                 "ALTER TABLE logs ADD COLUMN entry_type TEXT NOT NULL DEFAULT 'IN'"
             )
+        if "services" not in existing_columns:
+            db.execute("ALTER TABLE logs ADD COLUMN services TEXT")
         db.commit()
 
 
@@ -139,6 +142,7 @@ def log_page(slug):
 
     submitted_name = None
     submitted_type = None
+    new_log_id = None
     if request.method == "POST":
         employee_name = request.form.get("employee_name", "").strip()
         if not employee_name:
@@ -160,7 +164,7 @@ def log_page(slug):
             entry_type = "OUT" if last_entry and last_entry["entry_type"] == "IN" else "IN"
 
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            db.execute(
+            cursor = db.execute(
                 "INSERT INTO logs (location_id, employee_name, entry_type, logged_at) "
                 "VALUES (?, ?, ?, ?)",
                 (location["id"], employee_name, entry_type, now),
@@ -168,12 +172,54 @@ def log_page(slug):
             db.commit()
             submitted_name = employee_name
             submitted_type = entry_type
+            new_log_id = cursor.lastrowid
 
     return render_template(
         "log_page.html",
         location=location,
         submitted_name=submitted_name,
         submitted_type=submitted_type,
+        new_log_id=new_log_id,
+    )
+
+
+@app.route("/log/<slug>/services/<int:log_id>", methods=["POST"])
+def log_services(slug, log_id):
+    """
+    After a check-out, the employee is offered a text box to describe what
+    services were done. This saves that text onto the log entry that was
+    just created. Submitting blank simply skips it.
+    """
+    db = get_db()
+    location = db.execute(
+        "SELECT * FROM locations WHERE slug = ?", (slug,)
+    ).fetchone()
+    if location is None:
+        abort(404)
+
+    # Make sure this log entry actually belongs to this location and is a
+    # check-out, so the endpoint can't be used to edit arbitrary rows.
+    log_entry = db.execute(
+        "SELECT * FROM logs WHERE id = ? AND location_id = ? AND entry_type = 'OUT'",
+        (log_id, location["id"]),
+    ).fetchone()
+
+    if log_entry is not None:
+        services = request.form.get("services", "").strip()
+        if services:
+            db.execute(
+                "UPDATE logs SET services = ? WHERE id = ?",
+                (services, log_id),
+            )
+            db.commit()
+
+    return render_template(
+        "log_page.html",
+        location=location,
+        submitted_name=log_entry["employee_name"] if log_entry else None,
+        submitted_type="OUT" if log_entry else None,
+        new_log_id=None,
+        services_saved=True,
     )
 
 
@@ -265,6 +311,45 @@ def admin_delete_location(location_id):
     db.commit()
     flash("Location and its logs were deleted.", "success")
     return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/admins", methods=["GET", "POST"])
+@admin_required
+def admin_manage_admins():
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "add":
+            email = request.form.get("email", "").strip()
+            password = request.form.get("password", "")
+            confirm = request.form.get("confirm_password", "")
+            if not email or not password:
+                flash("Please provide both an email and a password.", "error")
+            elif password != confirm:
+                flash("Passwords do not match.", "error")
+            elif len(password) < 8:
+                flash("Password must be at least 8 characters.", "error")
+            else:
+                existed = auth_store.find_admin(email) is not None
+                auth_store.add_or_update_admin(email, password)
+                if existed:
+                    flash(f"Updated password for {email.strip().lower()}.", "success")
+                else:
+                    flash(f"Added new admin: {email.strip().lower()}.", "success")
+
+        elif action == "remove":
+            email = request.form.get("email", "")
+            if email.strip().lower() == session.get("admin_email"):
+                flash("You can't remove the account you're currently logged in as.", "error")
+            elif auth_store.remove_admin(email):
+                flash(f"Removed admin: {email.strip().lower()}.", "success")
+            else:
+                flash("Couldn't remove that admin (at least one admin must remain).", "error")
+
+        return redirect(url_for("admin_manage_admins"))
+
+    admins = auth_store.load_admins()
+    return render_template("admin_manage_admins.html", admins=admins)
 
 
 # ---------------------------------------------------------------------------
