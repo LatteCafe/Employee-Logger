@@ -105,6 +105,21 @@ they won't accidentally get committed if you put this project in git.
 - After that (or right away for a check-in), they see the final
   confirmation and can log another employee from the same device.
 
+## Timezone
+
+Servers often run on UTC regardless of where you or your employees
+actually are. By default, this app stores timestamps in UTC. To make
+logged times match your local clock, set a `TIMEZONE` environment
+variable to an IANA timezone name, for example:
+
+```
+TIMEZONE=America/Edmonton
+```
+
+Other examples: `America/New_York`, `America/Los_Angeles`, `Europe/London`,
+`Asia/Shanghai`. If `TIMEZONE` is unset or isn't a recognized name, the app
+falls back to UTC rather than erroring.
+
 ## Notes on the database
 
 Two tables are created automatically:

@@ -3,6 +3,7 @@ import sqlite3
 import secrets
 from datetime import datetime
 from functools import wraps
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from flask import (
     Flask, request, render_template, redirect, url_for,
@@ -25,6 +26,20 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.environ.get("DATA_DIR", BASE_DIR)
 os.makedirs(DATA_DIR, exist_ok=True)
 DATABASE = os.path.join(DATA_DIR, "database.db")
+
+# Servers often run in UTC regardless of where you or your employees
+# actually are. Set the TIMEZONE environment variable to an IANA zone name
+# (e.g. "America/Edmonton", "America/New_York", "Asia/Shanghai") so
+# logged times match your local clock. Defaults to UTC if unset or invalid.
+try:
+    APP_TIMEZONE = ZoneInfo(os.environ.get("TIMEZONE", "UTC"))
+except ZoneInfoNotFoundError:
+    APP_TIMEZONE = ZoneInfo("UTC")
+
+
+def now_str():
+    return datetime.now(APP_TIMEZONE).strftime("%Y-%m-%d %H:%M:%S")
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", secrets.token_hex(32))
@@ -163,7 +178,7 @@ def log_page(slug):
 
             entry_type = "OUT" if last_entry and last_entry["entry_type"] == "IN" else "IN"
 
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            now = now_str()
             cursor = db.execute(
                 "INSERT INTO logs (location_id, employee_name, entry_type, logged_at) "
                 "VALUES (?, ?, ?, ?)",
@@ -259,7 +274,7 @@ def admin_dashboard():
             flash("Please enter a location name.", "error")
         else:
             slug = generate_slug(name)
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            now = now_str()
             db.execute(
                 "INSERT INTO locations (name, slug, created_at) "
                 "VALUES (?, ?, ?)",
