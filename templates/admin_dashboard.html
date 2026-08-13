@@ -44,6 +44,17 @@
           <a class="location-link" href="{{ url_for('log_page', slug=loc['slug']) }}" target="_blank">
             {{ request.host_url }}log/{{ loc["slug"] }}
           </a>
+          <details class="rename-details">
+            <summary>Rename <span class="cjk">重命名 / 重新命名</span></summary>
+            <form method="POST" action="{{ url_for('admin_rename_location', location_id=loc['id']) }}" class="rename-form">
+              <input type="text" name="name" value="{{ loc['name'] }}" required>
+              <button type="submit" class="ghost-btn">Save <span class="cjk">保存 / 儲存</span></button>
+            </form>
+            <p class="stub-note" style="margin-top:6px;">
+              The check-in link above stays the same after renaming.
+              <br><span class="cjk">重命名后，上方的签到链接保持不变。</span>
+            </p>
+          </details>
         </div>
         <div class="location-meta">
           <span class="log-count">{{ loc["log_count"] }} log{{ '' if loc["log_count"] == 1 else 's' }}</span>
@@ -51,6 +62,9 @@
         <div class="location-actions">
           <a class="ghost-btn" href="{{ url_for('admin_location_log', location_id=loc['id']) }}">
             View Log <span class="cjk">查看记录 / 查看記錄</span>
+          </a>
+          <a class="ghost-btn" href="{{ url_for('admin_export_location', location_id=loc['id']) }}">
+            Export <span class="cjk">导出 / 匯出</span>
           </a>
           <form method="POST" action="{{ url_for('admin_delete_location', location_id=loc['id']) }}"
                 onsubmit="return confirm('Delete this location and all of its logs? This cannot be undone.');">

@@ -77,10 +77,17 @@ they won't accidentally get committed if you put this project in git.
 
 - Each location card shows its check-in link (click to open/copy) and a
   running count of logged entries.
+- Click **Rename** under a location's link to change its display name.
+  The check-in URL (slug) stays the same, so existing printed links/QR
+  codes keep working.
 - Click **View Log** on any location to see every employee entry, tagged
   as **Check-In** or **Check-Out**, with a timestamp — most recent first.
-- Click **Delete** to remove a location and all of its log entries
-  (asks for confirmation first).
+  Each row has its own **Delete** button to remove just that entry.
+- Click **Export** (on the dashboard or the log page) to download that
+  location's full log as an Excel (`.xlsx`) file — employee, type,
+  time, and services in one sheet.
+- Click **Delete** on a location card to remove the whole location and
+  all of its log entries (asks for confirmation first).
 
 ### Check-in page (`/log/<slug>`)
 

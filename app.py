@@ -1,14 +1,17 @@
 import os
 import sqlite3
 import secrets
+import io
 from datetime import datetime
 from functools import wraps
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from flask import (
     Flask, request, render_template, redirect, url_for,
-    session, g, abort, flash
+    session, g, abort, flash, send_file
 )
+from openpyxl import Workbook
+from openpyxl.styles import Font
 
 import auth_store
 
@@ -326,6 +329,101 @@ def admin_delete_location(location_id):
     db.commit()
     flash("Location and its logs were deleted.", "success")
     return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/location/<int:location_id>/rename", methods=["POST"])
+@admin_required
+def admin_rename_location(location_id):
+    db = get_db()
+    location = db.execute(
+        "SELECT * FROM locations WHERE id = ?", (location_id,)
+    ).fetchone()
+    if location is None:
+        abort(404)
+
+    new_name = request.form.get("name", "").strip()
+    if not new_name:
+        flash("Location name can't be empty.", "error")
+    else:
+        db.execute(
+            "UPDATE locations SET name = ? WHERE id = ?",
+            (new_name, location_id),
+        )
+        db.commit()
+        flash(f'Location renamed to "{new_name}".', "success")
+        # Note: the check-in URL (slug) is left unchanged on purpose, so
+        # any printed signs/QR codes for this location keep working.
+
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/location/<int:location_id>/logs/<int:log_id>/delete", methods=["POST"])
+@admin_required
+def admin_delete_log(location_id, log_id):
+    db = get_db()
+    location = db.execute(
+        "SELECT * FROM locations WHERE id = ?", (location_id,)
+    ).fetchone()
+    if location is None:
+        abort(404)
+
+    db.execute(
+        "DELETE FROM logs WHERE id = ? AND location_id = ?",
+        (log_id, location_id),
+    )
+    db.commit()
+    flash("Log entry deleted.", "success")
+    return redirect(url_for("admin_location_log", location_id=location_id))
+
+
+@app.route("/admin/location/<int:location_id>/export")
+@admin_required
+def admin_export_location(location_id):
+    db = get_db()
+    location = db.execute(
+        "SELECT * FROM locations WHERE id = ?", (location_id,)
+    ).fetchone()
+    if location is None:
+        abort(404)
+
+    logs = db.execute(
+        "SELECT * FROM logs WHERE location_id = ? ORDER BY logged_at ASC",
+        (location_id,),
+    ).fetchall()
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Logs"[:31]
+
+    headers = ["Employee", "Type", "Time", "Services"]
+    ws.append(headers)
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
+
+    for entry in logs:
+        ws.append([
+            entry["employee_name"],
+            "Check-In" if entry["entry_type"] == "IN" else "Check-Out",
+            entry["logged_at"],
+            entry["services"] or "",
+        ])
+
+    # Auto-size columns roughly based on content width.
+    for col_cells in ws.columns:
+        length = max((len(str(c.value)) if c.value is not None else 0) for c in col_cells)
+        ws.column_dimensions[col_cells[0].column_letter].width = min(max(length + 2, 12), 60)
+
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+
+    filename = f"{location['slug']}-logs.xlsx"
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=filename,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
 
 
 @app.route("/admin/admins", methods=["GET", "POST"])

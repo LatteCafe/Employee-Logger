@@ -10,7 +10,12 @@
         {{ request.host_url }}log/{{ location["slug"] }}
       </a>
     </div>
-    <a class="ghost-btn" href="{{ url_for('admin_dashboard') }}">← Back to Locations <span class="cjk">返回</span></a>
+    <div class="header-actions">
+      <a class="ghost-btn" href="{{ url_for('admin_export_location', location_id=location['id']) }}">
+        Export to Excel <span class="cjk">导出Excel / 匯出Excel</span>
+      </a>
+      <a class="ghost-btn" href="{{ url_for('admin_dashboard') }}">← Back to Locations <span class="cjk">返回</span></a>
+    </div>
   </header>
 
   <section class="panel">
@@ -27,6 +32,7 @@
             <th>Type <span class="cjk">类型 / 類型</span></th>
             <th>Time <span class="cjk">时间 / 時間</span></th>
             <th>Services <span class="cjk">服务内容 / 服務內容</span></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +48,13 @@
               </td>
               <td class="mono">{{ entry["logged_at"] }}</td>
               <td class="services-cell">{{ entry["services"] or "—" }}</td>
+              <td style="text-align:right;">
+                <form method="POST"
+                      action="{{ url_for('admin_delete_log', location_id=location['id'], log_id=entry['id']) }}"
+                      onsubmit="return confirm('Delete this log entry? This cannot be undone.');">
+                  <button type="submit" class="danger-btn danger-btn-small">Delete <span class="cjk">删除/刪除</span></button>
+                </form>
+              </td>
             </tr>
           {% endfor %}
         </tbody>

@@ -151,6 +151,11 @@ a { color: inherit; }
 
 .danger-btn:hover { background: var(--danger); color: #fff; }
 
+.danger-btn-small {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}
+
 input[type="text"], input[type="password"], input[type="email"], textarea {
   font-family: var(--font-body);
   font-size: 1rem;
@@ -426,6 +431,42 @@ label {
 }
 
 .location-link:hover { text-decoration: underline; }
+
+.rename-details {
+  margin-top: 8px;
+}
+
+.rename-details summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  list-style: none;
+}
+
+.rename-details summary::-webkit-details-marker { display: none; }
+
+.rename-details summary::before {
+  content: "▸ ";
+  font-size: 0.7rem;
+}
+
+.rename-details[open] summary::before {
+  content: "▾ ";
+}
+
+.rename-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  max-width: 380px;
+}
+
+.rename-form input {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
 
 .location-meta {
   font-family: var(--font-mono);
