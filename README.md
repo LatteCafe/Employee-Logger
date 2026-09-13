@@ -1,3 +1,8 @@
+## Disclaimer
+
+AI tools were heavily used in the creation of this tool, it is not representative of my skills or abilities and should not be used as a reference point of such
+While I almost always have AI write the **README** files for my projects AI was used for everything in this project except SQLite databases, excel exports and the basic logging itself.
+
 # Employee Check-In System
 
 A check-in / check-out logging system: employees log their name at a
